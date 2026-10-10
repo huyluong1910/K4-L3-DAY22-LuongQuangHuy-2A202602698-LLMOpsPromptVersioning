@@ -105,7 +105,7 @@ def get_embeddings(provider: str = None):
     """
     provider = (provider or config.PROVIDER).lower()
 
-    if provider in ("openai", "openrouter"):
+    if provider == "openai":
         from langchain_openai import OpenAIEmbeddings
         kwargs = {
             "model": config.OPENAI_EMBEDDING_MODEL,
@@ -114,6 +114,15 @@ def get_embeddings(provider: str = None):
         if config.OPENAI_BASE_URL:
             kwargs["base_url"] = config.OPENAI_BASE_URL
         return OpenAIEmbeddings(**kwargs)
+
+    elif provider == "openrouter":
+        from langchain_openai import OpenAIEmbeddings
+        return OpenAIEmbeddings(
+            model=getattr(config, "OPENROUTER_EMBEDDING_MODEL", "openai/text-embedding-3-small"),
+            api_key=config.OPENROUTER_API_KEY,
+            base_url=config.OPENROUTER_BASE_URL,
+            check_embedding_ctx_length=False,
+        )
 
     elif provider == "gemini":
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
